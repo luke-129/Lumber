@@ -52,9 +52,24 @@ int main()
     float cloudSpeed = 50.f;
 
     Clock clock;
+    bool bPaused = true;
 
     auto window = sf::RenderWindow(sf::VideoMode({1920u, 1080u}), "CMake SFML Project");
     window.setFramerateLimit(144);
+
+    // Initial Window drawing logic
+    window.clear();
+    window.draw(spriteCloud);
+    window.draw(spriteCloudTwo);
+    window.draw(spriteBackground);
+    window.draw(spriteMidground);
+    window.draw(spriteTree);
+    window.draw(spriteMidForeground);
+    window.draw(spriteBee);
+    //window.draw(spriteForeground);
+    window.display();
+    
+    
 
     while (window.isOpen())
     {
@@ -66,69 +81,82 @@ int main()
             }
         }
 
-        Time dt = clock.restart();
-
-        //Setup the bee
-
-        if (!beeActive)
+        if (Keyboard::isKeyPressed(Keyboard::Key::Enter))
         {
-            srand((int)time(0));
-            beeSpeed = (rand() % 200) + 200;
-            //How high is the bee
-            srand((int)time(0) * 10);
-            float height = (rand() % 500) + 500;
-            spriteBee.setPosition(Vector2f(2000, height));
-            beeActive = true;
+            bPaused = false;
         }
 
-        else
-        {
-            float beePositionX = spriteBee.getPosition().x;
-            spriteBee.setPosition(Vector2f(beePositionX - beeSpeed * dt.asSeconds(), spriteBee.getPosition().y));
 
+        // If the game is not paused
+        if (!bPaused)
+        {
+
+            Time dt = clock.restart();
+
+            //Setup the bee
+
+            if (!beeActive)
+            {
+                srand((int)time(0));
+                beeSpeed = (rand() % 200) + 200;
+                //How high is the bee
+                srand((int)time(0) * 10);
+                float height = (rand() % 500) + 500;
+                spriteBee.setPosition(Vector2f(2000, height));
+                beeActive = true;
+            }
+
+            // Move the bee
+            else
+            {
+                float beePositionX = spriteBee.getPosition().x;
+                spriteBee.setPosition(Vector2f(beePositionX - beeSpeed * dt.asSeconds(), spriteBee.getPosition().y));
+
+            }
+
+            if (spriteBee.getPosition().x < -100)
+            {
+                // Set it up ready to be a whole new bee next frame
+                beeActive = false;
+            }
+
+            // Cloud logic ---------------------
+
+            if (spriteCloud.getPosition().x < -500)
+                moveCloudleft = false;
+            if (spriteCloudTwo.getPosition().x > 1500)
+                moveCloudleft = true;
+
+            // Move cloud right
+            if (!moveCloudleft)
+            {
+
+                spriteCloud.setPosition(Vector2f(spriteCloud.getPosition().x + cloudSpeed * dt.asSeconds(), 0));
+                spriteCloudTwo.setPosition(Vector2f(spriteCloudTwo.getPosition().x + cloudSpeed * dt.asSeconds(), 0));
+            }
+
+            //Move cloud left
+            else
+            {
+                spriteCloud.setPosition(Vector2f(spriteCloud.getPosition().x - cloudSpeed * dt.asSeconds(), 0));
+                spriteCloudTwo.setPosition(Vector2f(spriteCloudTwo.getPosition().x - cloudSpeed * dt.asSeconds(), 0));
+            }
+
+
+            // Window drawing logic
+            window.clear();
+            window.draw(spriteCloud);
+            window.draw(spriteCloudTwo);
+            window.draw(spriteBackground);
+            window.draw(spriteMidground);
+            window.draw(spriteTree);
+            window.draw(spriteMidForeground);
+            window.draw(spriteBee);
+            //window.draw(spriteForeground);
+            window.display();
 
         }
-
-        if (spriteBee.getPosition().x < -100)
-        {
-            // Set it up ready to be a whole new bee next frame
-            beeActive = false;
-        }
-
-        // Cloud logic ---------------------
-
         
-
-        if (spriteCloud.getPosition().x < -500)
-            moveCloudleft = false;
-        if (spriteCloudTwo.getPosition().x > 1500)
-            moveCloudleft = true;
-
-        std::cout << moveCloudleft;
-        if (!moveCloudleft)
-        {
-
-            spriteCloud.setPosition(Vector2f(spriteCloud.getPosition().x + cloudSpeed * dt.asSeconds(), 0));
-            spriteCloudTwo.setPosition(Vector2f(spriteCloudTwo.getPosition().x + cloudSpeed * dt.asSeconds(), 0));
-        }
-
-        else
-        {
-            spriteCloud.setPosition(Vector2f(spriteCloud.getPosition().x - cloudSpeed * dt.asSeconds(), 0));
-            spriteCloudTwo.setPosition(Vector2f(spriteCloudTwo.getPosition().x - cloudSpeed * dt.asSeconds(), 0));
-        }
-
-        window.clear();
-        
-        window.draw(spriteCloud);
-        window.draw(spriteCloudTwo);
-        window.draw(spriteBackground);
-        window.draw(spriteMidground);
-        window.draw(spriteTree);
-        window.draw(spriteMidForeground);
-        window.draw(spriteBee);
-        //window.draw(spriteForeground);
-        window.display();
         
     }
 }
