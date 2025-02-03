@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include <sstream>
 using namespace sf;
 #include <iostream>
 
@@ -51,6 +52,35 @@ int main()
     bool moveCloudleft = true;
     float cloudSpeed = 50.f;
 
+    int score = 0;
+
+    // Text
+    Font font;
+    font.openFromFile("C:\\Users\\chasi\\source\\repos\\Lumber\\assets\\fonts\\PressStart2P-vaV7.ttf");
+
+    Text startText = Text(font, "");
+    Text scoreText = Text(font, "");
+
+    //Score
+    scoreText.setString("0");
+    scoreText.setCharacterSize(50);
+    scoreText.setFillColor(Color::White);
+    scoreText.setFont(font);
+
+    //Start of the game text
+    startText.setString("Press enter to start");
+    startText.setCharacterSize(50);
+    startText.setFillColor(Color::White);
+    startText.setFont(font);
+
+    // Position the text
+    FloatRect textRect = startText.getLocalBounds();
+    startText.setOrigin(textRect.getCenter());
+    startText.setPosition(Vector2f(1920 / 2, 1080 / 2));
+    scoreText.setPosition(Vector2f(20, 20));
+
+    
+
     Clock clock;
     bool bPaused = true;
 
@@ -67,6 +97,7 @@ int main()
     window.draw(spriteMidForeground);
     window.draw(spriteBee);
     //window.draw(spriteForeground);
+    window.draw(startText);
     window.display();
     
     
@@ -90,6 +121,10 @@ int main()
         // If the game is not paused
         if (!bPaused)
         {
+            std::stringstream ss;
+            ss << "Score: " << score;
+            scoreText.setString(ss.str());
+                  
 
             Time dt = clock.restart();
 
@@ -153,6 +188,7 @@ int main()
             window.draw(spriteMidForeground);
             window.draw(spriteBee);
             //window.draw(spriteForeground);
+            window.draw(scoreText);
             window.display();
 
         }
