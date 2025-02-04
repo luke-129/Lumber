@@ -58,7 +58,7 @@ int main()
     Font font;
     font.openFromFile("C:\\Users\\chasi\\source\\repos\\Lumber\\assets\\fonts\\PressStart2P-vaV7.ttf");
 
-    Text startText = Text(font, "");
+    Text messageText = Text(font, "");
     Text scoreText = Text(font, "");
 
     //Score
@@ -68,20 +68,32 @@ int main()
     scoreText.setFont(font);
 
     //Start of the game text
-    startText.setString("Press enter to start");
-    startText.setCharacterSize(50);
-    startText.setFillColor(Color::White);
-    startText.setFont(font);
+    messageText.setString("Press enter to start");
+    messageText.setCharacterSize(50);
+    messageText.setFillColor(Color::White);
+    messageText.setFont(font);
 
     // Position the text
-    FloatRect textRect = startText.getLocalBounds();
-    startText.setOrigin(textRect.getCenter());
-    startText.setPosition(Vector2f(1920 / 2, 1080 / 2));
+    FloatRect textRect = messageText.getLocalBounds();
+    messageText.setOrigin(textRect.getCenter());
+    messageText.setPosition(Vector2f(1920 / 2, 1080 / 2));
     scoreText.setPosition(Vector2f(20, 20));
 
     
 
     Clock clock;
+
+    //Time bar
+    RectangleShape timeBar;
+    float timeBarStartWidth = 400;
+    float timeBarHeight = 80;
+    timeBar.setSize(Vector2f(timeBarStartWidth, timeBarHeight));
+    timeBar.setFillColor(Color::Red);
+    timeBar.setPosition(Vector2f((1920 /2) - timeBarStartWidth / 2, 980));
+    Time gameTimeTotal;
+    float timeRemaining = 6.f;
+    float timeBarWidthPerSecond = timeBarStartWidth / timeRemaining;
+
     bool bPaused = true;
 
     auto window = sf::RenderWindow(sf::VideoMode({1920u, 1080u}), "CMake SFML Project");
@@ -97,7 +109,7 @@ int main()
     window.draw(spriteMidForeground);
     window.draw(spriteBee);
     //window.draw(spriteForeground);
-    window.draw(startText);
+    window.draw(messageText);
     window.display();
     
     
@@ -115,18 +127,26 @@ int main()
         if (Keyboard::isKeyPressed(Keyboard::Key::Enter))
         {
             bPaused = false;
+            score = 0;
+            timeRemaining = 6;
         }
 
 
         // If the game is not paused
         if (!bPaused)
         {
+            //Score
             std::stringstream ss;
             ss << "Score: " << score;
             scoreText.setString(ss.str());
                   
-
+            // Delta time
             Time dt = clock.restart();
+
+            //Subtract from the amount of time remaining
+            timeRemaining -= dt.asSeconds();
+            timeBar.setSize(Vector2f(timeBarWidthPerSecond * timeRemaining, timeBarHeight));
+
 
             //Setup the bee
 
@@ -189,6 +209,23 @@ int main()
             window.draw(spriteBee);
             //window.draw(spriteForeground);
             window.draw(scoreText);
+            window.draw(timeBar);
+            
+
+            if (timeRemaining <= 0.0f) {
+                // Pause the game
+                bPaused = true;
+                // Change the message shown to the player
+                messageText.setString("Out of time!!");
+                //Reposition the text based on its new size
+                FloatRect textRect = messageText.getLocalBounds();
+                messageText.setOrigin(textRect.getCenter());
+                messageText.setPosition(Vector2f(1920 / 2.0f, 1080 / 2.0f));
+                window.draw(messageText);
+
+            }
+
+
             window.display();
 
         }
