@@ -3,9 +3,36 @@
 using namespace sf;
 #include <iostream>
 
+
+
+void updateBranches(int seed);
+const int NUM_BRANCHES = 6;
+
+
+enum class side { LEFT, RIGHT, NONE };
+side branchPositions[NUM_BRANCHES];
+
 int main()
 {
+
+    
     /***********Texture and sprite logic*************/
+
+    // Branch
+
+    Texture branchTexture;
+    branchTexture.loadFromFile("C:\\Users\\chasi\\source\\repos\\Lumber\\assets\\graphics\\tree\\Branch.png");
+    Sprite branches[NUM_BRANCHES] = { Sprite(branchTexture), Sprite(branchTexture), Sprite(branchTexture), Sprite(branchTexture), Sprite(branchTexture),Sprite(branchTexture) };
+    for (int i = 0; i < NUM_BRANCHES; i++)
+    {
+        branches[i].scale(Vector2f(10,10));
+        branches[i].setPosition(Vector2f( - 2000, -2000));
+        // Set the sprite's origin to dead centre
+        // We can then spin it round without changing its position
+        branches[i].setOrigin(Vector2f(205, 20));
+    }
+
+    // Background
     Texture backgroundTexture;
     backgroundTexture.loadFromFile("C:\\Users\\chasi\\source\\repos\\Lumber\\assets\\graphics\\background\\background.png");
     Sprite spriteBackground = Sprite(backgroundTexture);
@@ -112,7 +139,16 @@ int main()
     window.draw(messageText);
     window.display();
     
-    
+    updateBranches(1);
+
+    updateBranches(2);
+
+    updateBranches(3);
+
+    updateBranches(4);
+
+    updateBranches(5);
+
 
     while (window.isOpen())
     {
@@ -140,6 +176,57 @@ int main()
             ss << "Score: " << score;
             scoreText.setString(ss.str());
                   
+
+            // update the branch sprites
+
+            for (int i = 0; i < NUM_BRANCHES; i++)
+
+            {
+
+                float height = i * 150;
+
+                if (branchPositions[i] == side::LEFT)
+
+                {
+
+                    // Move the sprite to the left side
+
+                    branches[i].setPosition(Vector2f(610, height));
+
+                    // Flip the sprite round the other way
+
+                    branches[i].setRotation(sf::Angle(sf::radians(120.f)));
+
+                }
+
+                else if (branchPositions[i] == side::RIGHT)
+
+                {
+
+                    // Move the sprite to the right side
+
+                    branches[i].setPosition(Vector2f(1330, height));
+
+                    // Set the sprite rotation to normal
+
+                    branches[i].setRotation(Angle());
+
+                }
+
+                else
+
+                {
+
+                    // Hide the branch
+
+                    branches[i].setPosition(Vector2f(3000, height));
+
+                }
+
+            }
+
+
+
             // Delta time
             Time dt = clock.restart();
 
@@ -204,6 +291,14 @@ int main()
             window.draw(spriteCloudTwo);
             window.draw(spriteBackground);
             window.draw(spriteMidground);
+            for (int i = 0; i < NUM_BRANCHES; i++)
+
+            {
+
+                window.draw(branches[i]);
+
+            }
+
             window.draw(spriteTree);
             window.draw(spriteMidForeground);
             window.draw(spriteBee);
@@ -234,3 +329,44 @@ int main()
     }
 }
 
+void updateBranches(int seed)
+{
+    // Move all the branches down one place
+
+    for (int j = NUM_BRANCHES - 1; j > 0; j--) {
+
+        branchPositions[j] = branchPositions[j - 1];
+
+    }
+
+    // Spawn a new branch at position 0
+
+    // LEFT, RIGHT or NONE
+
+    srand((int)time(0) + seed);
+
+    int r = (rand() % 5);
+
+    switch (r) {
+
+    case 0:
+
+        branchPositions[0] = side::LEFT;
+
+        break;
+
+    case 1:
+
+        branchPositions[0] = side::RIGHT;
+
+        break;
+
+    default:
+
+        branchPositions[0] = side::NONE;
+
+        break;
+
+    }
+
+}
